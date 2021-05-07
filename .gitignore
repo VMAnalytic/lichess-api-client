@@ -3,3 +3,6 @@ coverage.out
 vendor/
 .DS_Store
 .env
+
+# code coverage report
+cover.out
