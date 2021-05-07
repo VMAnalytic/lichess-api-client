@@ -1,4 +1,4 @@
-module lichess-api-client
+module github.com/VMAnalytic/lichess-api-client
 
 go 1.16
 
