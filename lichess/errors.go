@@ -7,7 +7,7 @@ import (
 
 type ErrorResponse struct {
 	Response *http.Response
-	Message  string         `json:"message"`
+	Message  string `json:"message"`
 }
 
 func (r *ErrorResponse) Error() string {
@@ -19,7 +19,7 @@ func (r *ErrorResponse) Error() string {
 type RateLimitError struct {
 	Rate     uint8
 	Response *http.Response
-	Message  string         `json:"message"`
+	Message  string `json:"message"`
 }
 
 func (r *RateLimitError) Error() string {

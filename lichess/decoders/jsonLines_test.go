@@ -1,9 +1,10 @@
 package decoders
 
 import (
-	"github.com/google/go-cmp/cmp"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 type TestStruct struct {

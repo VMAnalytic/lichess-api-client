@@ -5,7 +5,6 @@ linters:
         - errcheck
         - goimports
         - golint
-        - gosimple
         - govet
         - ineffassign
         - lll

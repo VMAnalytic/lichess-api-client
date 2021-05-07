@@ -3,6 +3,7 @@ package lichess
 import (
 	"context"
 	"fmt"
+
 	"github.com/pkg/errors"
 )
 
@@ -52,6 +53,7 @@ type ListOptions struct {
 func (s *GamesService) Get(ctx context.Context, ID string) (*Game, *Response, error) {
 	u := fmt.Sprintf("/api/game/export/%v?pgnInJson=true", ID)
 	req, err := s.client.NewRequest("GET", u, nil)
+
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "")
 	}
@@ -70,9 +72,11 @@ func (s *GamesService) Get(ctx context.Context, ID string) (*Game, *Response, er
 func (s *GamesService) List(ctx context.Context, username string, opts ListOptions) ([]*Game, *Response, error) {
 	u := fmt.Sprintf("/api/games/user/%v?pgnInJson=true&since=%v", username, opts.Since)
 	req, err := s.client.NewRequest("GET", u, nil)
+
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
+
 	req.Header.Set("Accept", mediaTypeEnableNDJson)
 
 	var games []*Game
@@ -87,7 +91,6 @@ func (s *GamesService) List(ctx context.Context, username string, opts ListOptio
 }
 
 func (s *GamesService) All(ctx context.Context, username string) (<-chan *Game, <-chan error) {
-
 	max := 10
 	since := 0
 	gch := make(chan *Game, 10)
@@ -102,12 +105,14 @@ func (s *GamesService) All(ctx context.Context, username string) (<-chan *Game, 
 		for {
 			u := fmt.Sprintf("/api/games/user/%v?pgnInJson=true&since=%v&max=%v", username, since, max)
 			req, err := s.client.NewRequest("GET", u, nil)
+
 			if err != nil {
 				errCh <- err
 				break
 			}
 
 			req.Header.Set("Accept", mediaTypeEnableNDJson)
+
 			var games []*Game
 
 			_, err = s.client.Do(ctx, req, &games)
@@ -124,6 +129,7 @@ func (s *GamesService) All(ctx context.Context, username string) (<-chan *Game, 
 			if len(games) < max {
 				close(gch)
 				close(errCh)
+
 				break
 			}
 

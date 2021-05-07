@@ -36,6 +36,7 @@ func (dec *Decoder) Decode(v interface{}) error {
 		if err := decoder.Decode(&obj); err != nil {
 			return err
 		}
+
 		ptr := reflect.Indirect(reflect.ValueOf(obj))
 		val.Set(reflect.Append(val, ptr))
 	}

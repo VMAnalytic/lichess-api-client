@@ -3,13 +3,14 @@ package lichess
 import (
 	"context"
 	"fmt"
-	"github.com/google/go-cmp/cmp"
 	"net/http"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestGamesService_Get(t *testing.T) {
-	client, mux, _, teardown := setUp()
+	client, mux, teardown := setUp()
 	defer teardown()
 
 	mux.HandleFunc("/user/vmyroslav", func(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +50,7 @@ func TestGamesService_Get(t *testing.T) {
 
 	ctx := context.Background()
 	user, _, err := client.Users.Get(ctx, "vmyroslav")
+
 	if err != nil {
 		t.Errorf("Account.GetMyEmail returned error: %v", err)
 	}

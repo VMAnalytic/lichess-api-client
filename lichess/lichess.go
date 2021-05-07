@@ -5,9 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/VMAnalytic/lichess-api-client/lichess/decoders"
-	"github.com/pkg/errors"
-	"golang.org/x/time/rate"
 	"io"
 	"io/ioutil"
 	"net"
@@ -15,6 +12,10 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/VMAnalytic/lichess-api-client/lichess/decoders"
+	"github.com/pkg/errors"
+	"golang.org/x/time/rate"
 )
 
 const (
@@ -45,6 +46,7 @@ func NewClient(apiKey string, httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = defaultHTTPClient()
 	}
+
 	baseURL, _ := url.Parse(defaultBaseURL)
 
 	rl := rate.NewLimiter(rate.Every(1*time.Second), 20)
@@ -95,6 +97,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	if !strings.HasSuffix(c.baseURL.Path, "/") {
 		return nil, fmt.Errorf("baseURL must have a trailing slash, but %q does not", c.baseURL)
 	}
+
 	u, err := c.baseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -106,6 +109,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		enc := json.NewEncoder(buf)
 		enc.SetEscapeHTML(true)
 		err := enc.Encode(body)
+
 		if err != nil {
 			return nil, err
 		}
@@ -119,11 +123,14 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	if body != nil {
 		req.Header.Set("Content-Type", contentType)
 	}
+
 	req.Header.Set("Accept", contentType)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
+
 	if c.UserAgent != "" {
 		req.Header.Set("User-Agent", c.UserAgent)
 	}
+
 	return req, nil
 }
 
@@ -143,14 +150,18 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 			decErr := decoders.NewDecoder(resp.Body).Decode(v)
 			return resp, decErr
 		}
+
 		decErr := json.NewDecoder(resp.Body).Decode(v)
+
 		if decErr == io.EOF {
 			decErr = nil // ignore EOF errors caused by empty response body
 		}
+
 		if decErr != nil {
 			err = decErr
 		}
 	}
+
 	return resp, err
 }
 
@@ -189,13 +200,16 @@ func (c *Client) checkResponse(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
 	}
+
 	errorResponse := &ErrorResponse{Response: r}
 	data, err := ioutil.ReadAll(r.Body)
+
 	if err == nil && data != nil {
-		json.Unmarshal(data, errorResponse)
+		_ = json.Unmarshal(data, errorResponse)
 	}
 
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(data))
+
 	switch {
 	case r.StatusCode == http.StatusTooManyRequests:
 		return &RateLimitError{

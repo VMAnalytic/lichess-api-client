@@ -3,6 +3,7 @@ package lichess
 import (
 	"context"
 	"fmt"
+
 	"github.com/pkg/errors"
 )
 
@@ -56,6 +57,7 @@ type Stats struct {
 func (s *UsersService) Get(ctx context.Context, username string) (*User, *Response, error) {
 	u := fmt.Sprintf("/api/user/%v", username)
 	req, err := s.client.NewRequest("GET", u, nil)
+
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "")
 	}

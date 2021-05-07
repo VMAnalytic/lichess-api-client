@@ -11,7 +11,7 @@ const (
 	baseURLPath = "/api"
 )
 
-func setUp() (client *Client, mux *http.ServeMux, serverURL string, teardown func()) {
+func setUp() (client *Client, mux *http.ServeMux, teardown func()) {
 	mux = http.NewServeMux()
 
 	apiHandler := http.NewServeMux()
@@ -26,11 +26,13 @@ func setUp() (client *Client, mux *http.ServeMux, serverURL string, teardown fun
 	uri, _ := url.Parse(server.URL + baseURLPath + "/")
 	client.baseURL = uri
 
-	return client, mux, server.URL, server.Close
+	return client, mux, server.Close
 }
 
+//nolint
 func testMethod(t *testing.T, r *http.Request, want string) {
 	t.Helper()
+
 	if got := r.Method; got != want {
 		t.Errorf("Request method: %v, want %v", got, want)
 	}

@@ -3,6 +3,7 @@ package lichess
 import (
 	"context"
 	"fmt"
+
 	"github.com/pkg/errors"
 )
 
@@ -49,6 +50,7 @@ type Preferences struct {
 func (s *AccountService) GetMyProfile(ctx context.Context) (*User, *Response, error) {
 	u := fmt.Sprint("/api/account")
 	req, err := s.client.NewRequest("GET", u, nil)
+
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "")
 	}
@@ -66,6 +68,7 @@ func (s *AccountService) GetMyProfile(ctx context.Context) (*User, *Response, er
 func (s *AccountService) GetMyEmail(ctx context.Context) (string, *Response, error) {
 	u := fmt.Sprint("/api/account/email")
 	req, err := s.client.NewRequest("GET", u, nil)
+
 	if err != nil {
 		return "", nil, errors.Wrap(err, "")
 	}
@@ -87,8 +90,10 @@ func (s *AccountService) GetMyPreferences(ctx context.Context) (*Preferences, *R
 	type prefResp struct {
 		Pref *Preferences `json:"prefs"`
 	}
+
 	u := fmt.Sprint("/api/account/preferences")
 	req, err := s.client.NewRequest("GET", u, nil)
+
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "")
 	}
@@ -96,7 +101,6 @@ func (s *AccountService) GetMyPreferences(ctx context.Context) (*Preferences, *R
 	pref := new(prefResp)
 
 	resp, err := s.client.Do(ctx, req, pref)
-
 
 	if err != nil {
 		return nil, resp, err

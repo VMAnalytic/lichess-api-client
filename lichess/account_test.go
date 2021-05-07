@@ -3,18 +3,19 @@ package lichess
 import (
 	"context"
 	"fmt"
-	"github.com/google/go-cmp/cmp"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestAccountService_GetMyEmail(t *testing.T) {
-	client, mux, _, teardown := setUp()
+	client, mux, teardown := setUp()
 	defer teardown()
 
 	mux.HandleFunc("/account/email", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
+		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 				"email": "example@email.com"
 			}`)
@@ -22,6 +23,7 @@ func TestAccountService_GetMyEmail(t *testing.T) {
 
 	ctx := context.Background()
 	email, _, err := client.Account.GetMyEmail(ctx)
+
 	if err != nil {
 		t.Errorf("Account.GetMyEmail returned error: %v", err)
 	}
@@ -33,11 +35,11 @@ func TestAccountService_GetMyEmail(t *testing.T) {
 }
 
 func TestAccountService_GetMyPreferences(t *testing.T) {
-	client, mux, _, teardown := setUp()
+	client, mux, teardown := setUp()
 	defer teardown()
 
 	mux.HandleFunc("/account/preferences", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
+		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 				"prefs": {
 					"dark": true,
@@ -53,18 +55,19 @@ func TestAccountService_GetMyPreferences(t *testing.T) {
 
 	ctx := context.Background()
 	pref, _, err := client.Account.GetMyPreferences(ctx)
+
 	if err != nil {
 		t.Errorf("Account.GetMyPreferences returned error: %v", err)
 	}
 
 	want := &Preferences{
-		Dark:          true,
-		Transparent:   false,
-		BgImg:         "//lichess1.org/assets/images/background/landscape.jpg",
-		Is3D:          false,
-		Theme:         "maple",
-		PieceSet:      "cburnett",
-		RookCastle:    1,
+		Dark:        true,
+		Transparent: false,
+		BgImg:       "//lichess1.org/assets/images/background/landscape.jpg",
+		Is3D:        false,
+		Theme:       "maple",
+		PieceSet:    "cburnett",
+		RookCastle:  1,
 	}
 
 	if diff := cmp.Diff(pref, want); diff != "" {
