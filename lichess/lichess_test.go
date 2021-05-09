@@ -8,22 +8,19 @@ import (
 )
 
 const (
-	baseURLPath = "/api"
+	baseURLPath = "/"
 )
 
 func setUp() (client *Client, mux *http.ServeMux, teardown func()) {
 	mux = http.NewServeMux()
 
 	apiHandler := http.NewServeMux()
-	apiHandler.Handle(baseURLPath+"/", http.StripPrefix(baseURLPath, mux))
-	apiHandler.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		http.Error(w, "Client.baseURL path prefix is not preserved in the request URL.", http.StatusInternalServerError)
-	})
+	apiHandler.Handle(baseURLPath, mux)
 
 	server := httptest.NewServer(apiHandler)
 
 	client = NewClient("API_KEY", nil)
-	uri, _ := url.Parse(server.URL + baseURLPath + "/")
+	uri, _ := url.Parse(server.URL + "/")
 	client.baseURL = uri
 
 	return client, mux, server.Close

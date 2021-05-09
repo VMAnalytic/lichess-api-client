@@ -25,7 +25,7 @@ type Game struct {
 				ID   string `json:"id"`
 			} `json:"user"`
 			Rating     int `json:"rating"`
-			Ratingdiff int `json:"ratingDiff"`
+			RatingDiff int `json:"ratingDiff"`
 		} `json:"white"`
 		Black struct {
 			User struct {
@@ -33,13 +33,18 @@ type Game struct {
 				ID   string `json:"id"`
 			} `json:"user"`
 			Rating     int `json:"rating"`
-			Ratingdiff int `json:"ratingDiff"`
+			RatingDiff int `json:"ratingDiff"`
 		} `json:"black"`
 	} `json:"players"`
-	Winner string `json:"winner"`
-	Moves  string `json:"moves"`
-	Pgn    string `json:"pgn"`
-	Clock  struct {
+	Winner  string `json:"winner"`
+	Moves   string `json:"moves"`
+	Pgn     string `json:"pgn"`
+	Opening struct {
+		Eco  string `json:"eco"`
+		Name string `json:"name"`
+		Ply  int64  `json:"ply"`
+	} `json:"opening"`
+	Clock struct {
 		Initial   int `json:"initial"`
 		Increment int `json:"increment"`
 		TotalTime int `json:"totalTime"`
@@ -51,11 +56,11 @@ type ListOptions struct {
 }
 
 func (s *GamesService) Get(ctx context.Context, ID string) (*Game, *Response, error) {
-	u := fmt.Sprintf("/api/game/export/%v?pgnInJson=true", ID)
+	u := fmt.Sprintf("/game/export/%v?pgnInJson=true", ID)
 	req, err := s.client.NewRequest("GET", u, nil)
 
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "")
+		return nil, nil, errors.WithStack(err)
 	}
 
 	game := new(Game)

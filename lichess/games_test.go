@@ -13,80 +13,114 @@ func TestGamesService_Get(t *testing.T) {
 	client, mux, teardown := setUp()
 	defer teardown()
 
-	mux.HandleFunc("/user/vmyroslav", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/game/export/12345678", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", mediaTypeEnableNDJson)
 		testMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{
-			"id": "vmyroslav",
-			"username": "VMyroslav",
-			"online": false,
-			"createdAt": 1617221900731,
-			"seenAt": 1619639888472,
-			"playTime": {
-				"total": 96338,
-				"tv": 0
-			},
-			"language": "en-US",
-			"url": "https://lichess.org/@/VMyroslav",
-			"nbFollowing": 0,
-			"nbFollowers": 0,
-			"completionRate": 97,
-			"count": {
-				"all": 145,
-				"rated": 143,
-				"ai": 2,
-				"draw": 13,
-				"drawH": 13,
-				"loss": 56,
-				"lossH": 56,
-				"win": 76,
-				"winH": 74,
-				"bookmark": 0,
-				"playing": 0,
-				"import": 0,
-				"me": 0
-			}
-		}`)
+		fmt.Fprint(w, `
+		{
+		  "id": "12345678",
+		  "rated": true,
+		  "variant": "standard",
+		  "speed": "blitz",
+		  "status": "draw",
+		  "opening": {
+			"eco": "D31",
+			"name": "Semi-Slav Defense: Marshall Gambit",
+			"ply": 7
+		  },
+		  "clock": {
+			"initial": 300,
+			"increment": 3,
+			"totalTime": 420
+		  }
+		}
+	`)
 	})
 
 	ctx := context.Background()
-	user, _, err := client.Users.Get(ctx, "vmyroslav")
+	game, _, err := client.Games.Get(ctx, "12345678")
 
 	if err != nil {
-		t.Errorf("Account.GetMyEmail returned error: %v", err)
+		t.Errorf("Games.Get returned error: %v", err)
 	}
 
-	want := &User{
-		ID:        "vmyroslav",
-		Username:  "VMyroslav",
-		Online:    false,
-		CreatedAt: 1617221900731,
-		SeenAt:    1619639888472,
-		Playtime: struct {
-			Total int `json:"total"`
-			Tv    int `json:"tv"`
-		}{96338, 0},
-		Language:       "en-US",
-		URL:            "https://lichess.org/@/VMyroslav",
-		CompletionRate: 97,
-		Profile:        nil,
-		Stat: &Stats{
-			All:      145,
-			Rated:    143,
-			Ai:       2,
-			Draw:     13,
-			DrawH:    13,
-			Loss:     56,
-			LossH:    56,
-			Win:      76,
-			WinH:     74,
-			Bookmark: 0,
-			Playing:  0,
-			Import:   0,
-			Me:       0,
-		},
+	want := &Game{
+		ID:      "12345678",
+		Rated:   true,
+		Variant: "standard",
+		Speed:   "blitz",
+		Status:  "draw",
+		Clock: struct {
+			Initial   int `json:"initial"`
+			Increment int `json:"increment"`
+			TotalTime int `json:"totalTime"`
+		}{Initial: 300, Increment: 3, TotalTime: 420},
+		Opening: struct {
+			Eco  string `json:"eco"`
+			Name string `json:"name"`
+			Ply  int64  `json:"ply"`
+		}(struct {
+			Eco  string
+			Name string
+			Ply  int64
+		}{Eco: "D31", Name: "Semi-Slav Defense: Marshall Gambit", Ply: 7}),
 	}
 
-	if diff := cmp.Diff(user, want); diff != "" {
+	if diff := cmp.Diff(game, want); diff != "" {
+		t.Errorf("Responses do not match. Diff: %+v", diff)
+	}
+}
+
+func TestGamesService_List(t *testing.T) {
+	client, mux, teardown := setUp()
+	defer teardown()
+
+	mux.HandleFunc("/api/games/user/test", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", mediaTypeEnableNDJson)
+		testMethod(t, r, http.MethodGet)
+		fmt.Fprint(w, `
+		{
+			"id": "id_1",
+			"rated": true,
+			"variant": "standard",
+			"perf": "rapid",
+			"createdAt": 1620384484273,
+			"status": "resign"
+		}
+		{
+			"id": "id_2",
+			"rated": false,
+			"variant": "standard",
+			"perf": "rapid",
+			"createdAt": 1620381701704,
+			"status": "mate"
+		}
+		`)
+	})
+
+	ctx := context.Background()
+	games, _, err := client.Games.List(ctx, "test", ListOptions{})
+
+	if err != nil {
+		t.Errorf("Games.List returned error: %v", err)
+	}
+
+	want := []*Game{{
+		ID:        "id_1",
+		Rated:     true,
+		Variant:   "standard",
+		Perf:      "rapid",
+		CreatedAt: 1620384484273,
+		Status:    "resign",
+	}, {ID: "id_2",
+		Rated:     false,
+		Variant:   "standard",
+		Perf:      "rapid",
+		CreatedAt: 1620381701704,
+		Status:    "mate",
+	}}
+
+	if diff := cmp.Diff(games, want); diff != "" {
 		t.Errorf("Responses do not match. Diff: %+v", diff)
 	}
 }

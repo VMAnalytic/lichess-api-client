@@ -13,7 +13,7 @@ func TestUsersService_Get(t *testing.T) {
 	client, mux, teardown := setUp()
 	defer teardown()
 
-	mux.HandleFunc("/user/vmyroslav", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/user/vmyroslav", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 			"id": "vmyroslav",

@@ -14,7 +14,7 @@ func TestAccountService_GetMyEmail(t *testing.T) {
 	client, mux, teardown := setUp()
 	defer teardown()
 
-	mux.HandleFunc("/account/email", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/account/email", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 				"email": "example@email.com"
@@ -38,7 +38,7 @@ func TestAccountService_GetMyPreferences(t *testing.T) {
 	client, mux, teardown := setUp()
 	defer teardown()
 
-	mux.HandleFunc("/account/preferences", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/account/preferences", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 				"prefs": {
@@ -72,5 +72,54 @@ func TestAccountService_GetMyPreferences(t *testing.T) {
 
 	if diff := cmp.Diff(pref, want); diff != "" {
 		t.Errorf("Account.GetMyPreferences returned %+v, want %+v", pref, want)
+	}
+}
+
+func TestAccountService_GetMyProfile(t *testing.T) {
+	client, mux, teardown := setUp()
+	defer teardown()
+
+	mux.HandleFunc("/api/account", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodGet)
+		fmt.Fprint(w, `{
+				"id": "testID",
+				"username": "Test",
+				"online": false,
+				"createdAt": 1617221900731,
+				"seenAt": 1620387000153,
+				"playTime": {
+					"total": 121450,
+					"tv": 0
+				},
+				"language": "en-US",
+				"count": {
+					"all": 176
+				}
+			}`)
+	})
+
+	ctx := context.Background()
+	prof, _, err := client.Account.GetMyProfile(ctx)
+
+	if err != nil {
+		t.Errorf("Account.GetMyProfile returned error: %v", err)
+	}
+
+	want := &User{
+		ID:        "testID",
+		Username:  "Test",
+		Online:    false,
+		CreatedAt: 1617221900731,
+		SeenAt:    1620387000153,
+		Playtime: struct {
+			Total int `json:"total"`
+			Tv    int `json:"tv"`
+		}{Total: 121450, Tv: 0},
+		Language: "en-US",
+		Stat:     &Stats{All: 176},
+	}
+
+	if diff := cmp.Diff(prof, want); diff != "" {
+		t.Errorf("Account.GetMyProfile returned %+v, want %+v", prof, want)
 	}
 }
