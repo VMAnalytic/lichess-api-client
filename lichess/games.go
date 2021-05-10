@@ -96,9 +96,9 @@ func (s *GamesService) List(ctx context.Context, username string, opts ListOptio
 }
 
 func (s *GamesService) All(ctx context.Context, username string) (<-chan *Game, <-chan error) {
-	max := 10
+	max := 50
 	since := 0
-	gch := make(chan *Game, 10)
+	gch := make(chan *Game, max)
 	errCh := make(chan error)
 
 	defer func() {

@@ -49,7 +49,7 @@ func NewClient(apiKey string, httpClient *http.Client) *Client {
 
 	baseURL, _ := url.Parse(defaultBaseURL)
 
-	rl := rate.NewLimiter(rate.Every(1*time.Second), 20)
+	rl := rate.NewLimiter(rate.Every(1*time.Second), 50)
 
 	c := &Client{client: httpClient, baseURL: baseURL, apiKey: apiKey, UserAgent: userAgent}
 	c.common.client = c
@@ -73,12 +73,8 @@ func defaultHTTPClient() *http.Client {
 	}
 }
 
-func (c *Client) SetLimits(limit time.Duration, burst int) error {
-	if burst <= 0 {
-		return errors.New("burst should be > 0")
-	}
-
-	c.rateLimiter = rate.NewLimiter(rate.Every(limit), burst)
+func (c *Client) SetLimits(limit time.Duration, burst uint) error {
+	c.rateLimiter = rate.NewLimiter(rate.Every(limit), int(burst))
 
 	return nil
 }
