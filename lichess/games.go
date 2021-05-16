@@ -27,10 +27,10 @@ type Game struct {
 			Rating     int `json:"rating"`
 			RatingDiff int `json:"ratingDiff"`
 			Analysis   struct {
-				Inaccuracy string `json:"inaccuracy"`
-				Mistake    string `json:"mistake"`
-				Blunder    string `json:"blunder"`
-				ACPL       string `json:"acpl"`
+				Inaccuracy uint8 `json:"inaccuracy"`
+				Mistake    uint8 `json:"mistake"`
+				Blunder    uint8 `json:"blunder"`
+				ACPL       uint8 `json:"acpl"`
 			} `json:"analysis"`
 		} `json:"white"`
 		Black struct {
@@ -41,10 +41,10 @@ type Game struct {
 			Rating     int `json:"rating"`
 			RatingDiff int `json:"ratingDiff"`
 			Analysis   struct {
-				Inaccuracy string `json:"inaccuracy"`
-				Mistake    string `json:"mistake"`
-				Blunder    string `json:"blunder"`
-				ACPL       string `json:"acpl"`
+				Inaccuracy uint8 `json:"inaccuracy"`
+				Mistake    uint8 `json:"mistake"`
+				Blunder    uint8 `json:"blunder"`
+				ACPL       uint8 `json:"acpl"`
 			} `json:"analysis"`
 		} `json:"black"`
 	} `json:"players"`
