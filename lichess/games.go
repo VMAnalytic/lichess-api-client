@@ -24,28 +24,18 @@ type Game struct {
 				Name string `json:"name"`
 				ID   string `json:"id"`
 			} `json:"user"`
-			Rating     int `json:"rating"`
-			RatingDiff int `json:"ratingDiff"`
-			Analysis   struct {
-				Inaccuracy uint8 `json:"inaccuracy"`
-				Mistake    uint8 `json:"mistake"`
-				Blunder    uint8 `json:"blunder"`
-				ACPL       uint8 `json:"acpl"`
-			} `json:"analysis"`
+			Rating     int       `json:"rating"`
+			RatingDiff int       `json:"ratingDiff"`
+			Analysis   *Analysis `json:"analysis"`
 		} `json:"white"`
 		Black struct {
 			User struct {
 				Name string `json:"name"`
 				ID   string `json:"id"`
 			} `json:"user"`
-			Rating     int `json:"rating"`
-			RatingDiff int `json:"ratingDiff"`
-			Analysis   struct {
-				Inaccuracy uint8 `json:"inaccuracy"`
-				Mistake    uint8 `json:"mistake"`
-				Blunder    uint8 `json:"blunder"`
-				ACPL       uint8 `json:"acpl"`
-			} `json:"analysis"`
+			Rating     int       `json:"rating"`
+			RatingDiff int       `json:"ratingDiff"`
+			Analysis   *Analysis `json:"analysis"`
 		} `json:"black"`
 	} `json:"players"`
 	Winner  string `json:"winner"`
@@ -61,6 +51,13 @@ type Game struct {
 		Increment int `json:"increment"`
 		TotalTime int `json:"totalTime"`
 	} `json:"clock"`
+}
+
+type Analysis struct {
+	Inaccuracy uint8 `json:"inaccuracy"`
+	Mistake    uint8 `json:"mistake"`
+	Blunder    uint8 `json:"blunder"`
+	ACPL       uint8 `json:"acpl"`
 }
 
 type ListOptions struct {
@@ -87,7 +84,7 @@ func (s *GamesService) Get(ctx context.Context, ID string) (*Game, *Response, er
 }
 
 func (s *GamesService) List(ctx context.Context, username string, opts ListOptions) ([]*Game, *Response, error) {
-	u := fmt.Sprintf("/api/games/user/%v?pgnInJson=true&since=%v", username, opts.Since)
+	u := fmt.Sprintf("/api/games/user/%v?pgnInJson=true&since=%v&opening=true&cloacks=true", username, opts.Since)
 	req, err := s.client.NewRequest("GET", u, nil)
 
 	if err != nil {
