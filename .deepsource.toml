@@ -1,0 +1,12 @@
+version = 1
+
+test_patterns = ["test.go"]
+
+exclude_patterns = [".github"]
+
+[[analyzers]]
+name = "go"
+enabled = true
+
+  [analyzers.meta]
+  import_root = "github.com/VMAnalytic/lichess-api-client"
